@@ -13,20 +13,14 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -37,25 +31,25 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.content.ContextCompat.startActivity
 import com.example.numbasapp.ui.theme.NumbasAppTheme
 import org.bouncycastle.crypto.generators.SCrypt
 import org.json.JSONObject
+import javax.crypto.BadPaddingException
 import javax.crypto.Cipher
 import javax.crypto.SecretKey
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
+import androidx.compose.ui.graphics.Color
+
+private const val TAG = "NumbasMainActivity"
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,38 +62,48 @@ class MainActivity : ComponentActivity() {
                 val data: Uri? = intent.data
                 val salt = "45ab2cf2e139c01f8447d17dc653d585"
 
-                Log.d("MainActivity", "Intent Action: $action")
-                Log.d("MainActivity", "Intent Data: $data")
+                Log.d(TAG, "Intent Action: $action")
+                Log.d(TAG, "Intent Data: $data")
 
                 // State variables
-                var showPasswordDialog by remember { mutableStateOf(false) }
-                //var url by remember { mutableStateOf("") }
+                var showPasswordPage by remember { mutableStateOf(false)}
+                var currentPasswordBad by remember { mutableStateOf(false)}
                 var password by remember {mutableStateOf("")}
-                //var authorization by remember { mutableStateOf("")}
                 var launchData by remember { mutableStateOf(LaunchData("",""))}
 
                 // Handle custom URL intent
                 if (Intent.ACTION_VIEW == action && data != null && data.scheme == "numbas") {
-                    //val host = data.host ?: ""
-                    //val token = data.pathSegments.lastOrNull()
-                    //url = "https://www.numbas.org.uk/lockdown-app/debug_headers.php" //need to use token
-                    showPasswordDialog = true
+                    if (password != "") {
+                        try {
+                            launchData = decryptSettings(password, salt, uri = data)
+                            showPasswordPage = false
+                        } catch (e: IncorrectPasswordException) {
+                            currentPasswordBad = true
+                            showPasswordPage = true
+                        }
+                    } else {
+                        showPasswordPage = true
+                    }
                 }
 
                 // Main UI
                 Surface(color = MaterialTheme.colorScheme.background) {
-                    if (showPasswordDialog) {
-                        PasswordDialog(
-                            onDismiss = { showPasswordDialog = false },
-                            onConfirm = { enteredPassword ->
+                    if (showPasswordPage) {
+                        PasswordPage(
+                            password,
+                            sendPassword = { enteredPassword ->
                                 password = enteredPassword
-                                launchData = decryptSettings(password,salt,uri = data)
-                                //authorization = launchData.token
-                                showPasswordDialog = false
-                            }
-                        )
-                    } else if (launchData.url.isNotEmpty() && launchData.token.isNotEmpty()) {
-                        //LoadWebPage("https://www.numbas.org.uk/lockdown-app/debug_headers.php", mapOf("Authorization" to launchData.token))
+                                try {
+                                    launchData = decryptSettings(password, salt, uri = data)
+                                    currentPasswordBad = false
+                                    showPasswordPage = false
+                                } catch (e: IncorrectPasswordException) {
+                                    currentPasswordBad = true //this is not currently cascaded down....
+                                }
+                            }, currentPasswordBad
+                            )
+                    }
+                     else if (launchData.url.isNotEmpty() && launchData.token.isNotEmpty()) {
                         LoadWebPage(launchData.url, mapOf("Authorization" to "Basic " + launchData.token))
                     } else {
                         InfoPage()
@@ -111,18 +115,9 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-@Preview
-fun PasswordPagePreview() {
-    NumbasAppTheme {
-        Surface(color = MaterialTheme.colorScheme.background) {
-            PasswordPage()
-        }
-    }
-}
-
-@Composable
-fun PasswordPage() {
-    var password by remember { mutableStateOf("") }
+fun PasswordPage(savedPassword: String, sendPassword: (String) -> Unit, passwordBad: Boolean = false) {
+    var password by remember { mutableStateOf(savedPassword) }
+    var unsubmittedPassword by remember { mutableStateOf(false)}
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -148,7 +143,10 @@ fun PasswordPage() {
             Spacer(modifier = Modifier.height(20.dp))
             TextField(
                 value = password,
-                onValueChange = {password = it},
+                onValueChange = {
+                    password = it
+                    unsubmittedPassword = true
+                },
                 label = {Text("Enter Password")},
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions.Default.copy(
@@ -156,8 +154,14 @@ fun PasswordPage() {
                     imeAction = ImeAction.Done
                 )
             )
+            if (passwordBad and !unsubmittedPassword) {
+                Text(text = "The current password could not be used to open this link. Either the password is incorrect, or the link is invalid.",color = Color.Red)
+            }
             Spacer(modifier = Modifier.height(10.dp))
-            Button(onClick = {/*TODO*/}){ //make deactivated when password empty
+            Button(onClick = {
+                unsubmittedPassword = false
+                sendPassword(password)
+            }){ //TODO: make deactivated when password empty
                 Text(text = "Open")
             }
 
@@ -165,37 +169,6 @@ fun PasswordPage() {
         Spacer(modifier = Modifier.height(32.dp))
     }
 
-}
-
-
-@Composable
-fun PasswordDialog(onDismiss: () -> Unit, onConfirm: (String) -> Unit) {
-    var password by remember { mutableStateOf("") }
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(text = "Enter Password") },
-        text = {
-            Column {
-                OutlinedTextField(
-                    value = password,
-                    onValueChange = { password = it },
-                    label = { Text("Password") },
-                    visualTransformation = PasswordVisualTransformation()
-                )
-            }
-        },
-        confirmButton = {
-            Button(onClick = { onConfirm(password) }) {
-                Text("OK")
-            }
-        },
-        dismissButton = {
-            Button(onClick = onDismiss) {
-                Text("Cancel")
-            }
-        }
-    )
 }
 
 
@@ -274,7 +247,7 @@ fun TestButton() {
 
 
 data class LaunchData(val url: String, val token: String)
-
+class IncorrectPasswordException(message: String) : Exception(message)
 
 //https://www.baeldung.com/kotlin/advanced-encryption-standard
 
@@ -295,7 +268,7 @@ fun generateScryptKey(password: String, salt: String): SecretKeySpec {
     return secretKey
 }
 
-// currently using an experimental function to retrieve the token from the encoded hex array, #
+// currently using an experimental function to retrieve the token from the encoded hex array,
 // consider re-writing into something more permanent
 // https://www.baeldung.com/kotlin/string-hex-byte-array-conversion#:~:text=5.,Using%20BigInteger&text=We%20convert%20a%20hex%20string,return%20the%20corresponding%20byte%20array.
 @OptIn(ExperimentalStdlibApi::class)
@@ -309,13 +282,20 @@ fun decryptSettings(password: String, salt: String, uri: Uri?) : LaunchData {
 
     val secretKey = generateScryptKey(password, salt)
 
-    val decryptActual = aesDecrypt(data, secretKey,iv)
-    val clearText = String(decryptActual)
+    try {
+        val decryptedToken = aesDecrypt(data, secretKey,iv)
+        val clearText = String(decryptedToken)
 
-    val json = JSONObject(clearText)
+        val json = JSONObject(clearText)
 
-    val launchURL: String = json.getString("url")
-    val token: String = json.getString("token")
+        val launchURL: String = json.getString("url")
+        val token: String = json.getString("token")
 
-    return LaunchData(url = launchURL, token = token)
+        return LaunchData(url = launchURL, token = token)
+    }  catch (e: BadPaddingException) {
+        if (e.toString() == "javax.crypto.BadPaddingException: error:1e000065:Cipher functions:OPENSSL_internal:BAD_DECRYPT") {
+            throw IncorrectPasswordException("Password $password does not allow decryption")
+        }
+    }
+    return LaunchData("","") //should never reach this part but if it does there's an empty return because kotlin refuses to compile without it
 }
