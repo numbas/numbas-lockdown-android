@@ -49,6 +49,7 @@ import javax.crypto.SecretKey
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 
 private const val TAG = "NumbasMainActivity"
 
@@ -158,14 +159,14 @@ fun PasswordPage(savedPassword: String, sendPassword: (String) -> Unit, password
             painter = painterResource(R.drawable.numbas_logo),
             contentDescription = "")
             Text(
-                text = "Opening a Numbas Link",
+                text = stringResource(R.string.opening_a_numbas_link),
                 style = MaterialTheme.typography.headlineLarge,
                 textAlign = TextAlign.Center
             )
         }
         Column (horizontalAlignment = Alignment.CenterHorizontally)  {
             Text(
-                text = "Enter the password to open this Numbas link.\n Your instructor should have given you the password.",
+                text = stringResource(R.string.enter_password_instruction),
                 style = MaterialTheme.typography.bodyLarge
             )
             Spacer(modifier = Modifier.height(20.dp))
@@ -175,7 +176,7 @@ fun PasswordPage(savedPassword: String, sendPassword: (String) -> Unit, password
                     password = it
                     unsubmittedPassword = true
                 },
-                label = {Text("Enter Password")},
+                label = {Text(stringResource(R.string.enter_password))},
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions.Default.copy(
                     keyboardType = KeyboardType.Password,
@@ -183,14 +184,14 @@ fun PasswordPage(savedPassword: String, sendPassword: (String) -> Unit, password
                 )
             )
             if (passwordBad and !unsubmittedPassword) {
-                Text(text = "The current password could not be used to open this link. Either the password is incorrect, or the link is invalid.",color = Color.Red)
+                Text(text = stringResource(R.string.password_failed_text),color = Color.Red)
             }
             Spacer(modifier = Modifier.height(10.dp))
             Button(onClick = {
                 unsubmittedPassword = false
                 sendPassword(password)
             }){ //TODO: make deactivated when password empty
-                Text(text = "Open")
+                Text(text = stringResource(R.string.open_link))
             }
 
         }
@@ -248,12 +249,12 @@ fun InfoPage() {
             contentDescription = "")//,modifier = Modifier.fillMaxWidth()) //width fill doesn't work
         Column {
             Text(
-                text = "This is the Numbas lockdown app",
+                text = stringResource(R.string.lockdown_app_declaration),
                 style = MaterialTheme.typography.headlineLarge
             )
             Spacer(modifier = Modifier.height(32.dp))
             Text(
-                text = "You don't normally need to open this app directly.\n Click on a Numbas link in a browser to use this app",
+                text = stringResource(R.string.use_a_link),
                 style = MaterialTheme.typography.bodyLarge
             )
         }
@@ -269,7 +270,7 @@ fun TestButton() {
         val intent = Intent(Intent.ACTION_VIEW, uri)
         ctx.startActivity(intent)
     }) {
-        Text(text = "Open the test page")
+        Text(text = stringResource(R.string.open_test_page))
     }
 
 }
