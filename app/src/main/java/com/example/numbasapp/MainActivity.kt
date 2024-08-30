@@ -28,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,7 +52,20 @@ import androidx.compose.ui.graphics.Color
 
 private const val TAG = "NumbasMainActivity"
 
+class Common{
+    //this class provides the password which allows it to persist between activity launches,
+    // so we can try the 'old' password as long as the app has not been closed.
+    companion object{
+        var password = ""
+    }
+}
+
 class MainActivity : ComponentActivity() {
+
+    companion object {
+        const val PASSWORD = "PASSWORD"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -68,14 +82,14 @@ class MainActivity : ComponentActivity() {
                 // State variables
                 var showPasswordPage by remember { mutableStateOf(false)}
                 var currentPasswordBad by remember { mutableStateOf(false)}
-                var password by remember {mutableStateOf("")}
+                //var password by remember {mutableStateOf("")}
                 var launchData by remember { mutableStateOf(LaunchData("",""))}
 
                 // Handle custom URL intent
                 if (Intent.ACTION_VIEW == action && data != null && data.scheme == "numbas") {
-                    if (password != "") {
+                    if (Common.password != "") {
                         try {
-                            launchData = decryptSettings(password, salt, uri = data)
+                            launchData = decryptSettings(Common.password, salt, uri = data)
                             showPasswordPage = false
                         } catch (e: IncorrectPasswordException) {
                             currentPasswordBad = true
@@ -90,11 +104,11 @@ class MainActivity : ComponentActivity() {
                 Surface(color = MaterialTheme.colorScheme.background) {
                     if (showPasswordPage) {
                         PasswordPage(
-                            password,
+                            Common.password,
                             sendPassword = { enteredPassword ->
-                                password = enteredPassword
+                                Common.password = enteredPassword
                                 try {
-                                    launchData = decryptSettings(password, salt, uri = data)
+                                    launchData = decryptSettings(Common.password, salt, uri = data)
                                     currentPasswordBad = false
                                     showPasswordPage = false
                                 } catch (e: IncorrectPasswordException) {
@@ -112,6 +126,20 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.run {
+            putString(PASSWORD, Common.password)
+        }
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        Common.password = savedInstanceState.getString(PASSWORD).toString()
+
+        super.onRestoreInstanceState(savedInstanceState)
+    }
+
 }
 
 @Composable
@@ -198,6 +226,7 @@ fun LoadWebPage(url: String, extraHeaders: Map<String,String>) {
             WebView(context).apply {
                 webViewClient = NumbasWebViewClient(extraHeaders)
                 settings.javaScriptEnabled = true
+                settings.domStorageEnabled = true
                 loadUrl(url, extraHeaders)
             }
         }
