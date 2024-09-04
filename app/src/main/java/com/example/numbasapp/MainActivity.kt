@@ -11,13 +11,17 @@ import android.webkit.WebViewClient
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
@@ -53,6 +57,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 
 private const val TAG = "NumbasMainActivity"
@@ -161,7 +166,9 @@ fun PasswordPage(savedPassword: String, sendPassword: (String) -> Unit, password
         Column (horizontalAlignment = Alignment.CenterHorizontally) {
             Image(
             painter = painterResource(R.drawable.numbas_logo),
-            contentDescription = "")
+            contentDescription = "",
+                modifier = Modifier.fillMaxWidth(),
+            contentScale = ContentScale.Fit)
             Text(
                 text = stringResource(R.string.opening_a_numbas_link),
                 style = MaterialTheme.typography.headlineLarge,
@@ -264,7 +271,9 @@ fun InfoPage() {
     ) {
         Image(
             painter = painterResource(R.drawable.numbas_logo),
-            contentDescription = "")//,modifier = Modifier.fillMaxWidth()) //width fill doesn't work
+            contentDescription = "",
+            modifier = Modifier.fillMaxWidth(0.33F),
+            contentScale = ContentScale.FillWidth)
         Column {
             Text(
                 text = stringResource(R.string.lockdown_app_declaration),
