@@ -13,26 +13,26 @@ import androidx.compose.ui.platform.LocalContext
 import com.example.numbasapp.R
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
-)
+        background = Color(0xFF1A2933),
+        onBackground = Color.White,
+        primary = Color(0xFF2f7dd4),
+        onPrimary = Color.White,
+        surfaceVariant = Color(0xFF213f52),
+        onSurfaceVariant = Color(0xFFC7C9CA),
+    )
 
 private val LightColorScheme = lightColorScheme(
     background = Color(0xFFa2d1f0),
     onBackground = Color.Black,
-    primary = Color(0xFF017AFF),
+    primary = Color(0xFF0E66C7),
     onPrimary = Color.White,
-    secondary = Color.Magenta,
-    tertiary = Color.Yellow
 
     /* Other default colors to override
-    background = Color(0xFFFFFBFE),
     surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
+    secondary = Color.Magenta,
+    tertiary = Color.Yellow
     onSecondary = Color.White,
     onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
     onSurface = Color(0xFF1C1B1F),
     */
 )

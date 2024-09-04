@@ -67,5 +67,4 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation("org.bouncycastle:bcprov-jdk15to18:1.76")
-    implementation("org.abstractj.kalium:kalium:0.8.0")
 }
