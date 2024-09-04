@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -49,6 +50,9 @@ import javax.crypto.SecretKey
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.res.stringResource
 
 private const val TAG = "NumbasMainActivity"
@@ -182,7 +186,20 @@ fun PasswordPage(savedPassword: String, sendPassword: (String) -> Unit, password
                 keyboardOptions = KeyboardOptions.Default.copy(
                     keyboardType = KeyboardType.Password,
                     imeAction = ImeAction.Done
-                )
+                ),
+                keyboardActions = KeyboardActions(onDone = {
+                    unsubmittedPassword = false
+                    sendPassword(password)
+                }),
+                modifier = Modifier.onKeyEvent { event ->
+                    return@onKeyEvent if (event.key.keyCode == Key.Enter.keyCode){
+                        unsubmittedPassword = false
+                        sendPassword(password)
+                        true
+                    } else {
+                        false
+                    }
+                }
             )
             if (passwordBad and !unsubmittedPassword) {
                 Text(text = stringResource(R.string.password_failed_text),color = Color.Red)
