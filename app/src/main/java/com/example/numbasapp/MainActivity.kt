@@ -171,6 +171,7 @@ fun PasswordPage(savedPassword: String, sendPassword: (String) -> Unit, password
             )
             Spacer(modifier = Modifier.height(20.dp))
             TextField(
+                singleLine = true,
                 value = password,
                 onValueChange = {
                     password = it
