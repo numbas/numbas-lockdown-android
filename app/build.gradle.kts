@@ -67,4 +67,6 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation("org.bouncycastle:bcprov-jdk15to18:1.76")
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
+
 }

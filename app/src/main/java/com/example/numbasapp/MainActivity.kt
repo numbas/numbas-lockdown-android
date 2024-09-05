@@ -61,11 +61,18 @@ import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.datastore.core.DataStore
+import androidx.datastore.core.IOException
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.runBlocking
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "storage")
-private const val TAG = "NumbasMainActivity"
 
 class Common{
     //this class provides the password which allows it to persist between activity launches,
@@ -77,12 +84,42 @@ class Common{
 
 class MainActivity : ComponentActivity() {
 
+    private val TAG = "NumbasMainActivity"
+
+    private object PreferencesKeys {
+        val PASSWORD = stringPreferencesKey("password")
+    }
+
+    private suspend fun fetchPassword(): String {
+        try {
+        var retrievedPassword = dataStore.data.first().toPreferences()[PreferencesKeys.PASSWORD] ?: ""
+        return retrievedPassword }
+        catch (e: Exception) {
+            //if local storage fails, universally revert to re-asking for the password no matter what
+            Log.e(TAG,"password could not be retrieved from permanent storage due to ${e.toString()}")
+            return ""
+        }
+    }
+    private suspend fun storePassword(password: String) {
+        try {
+            dataStore.edit { preferences -> preferences[PreferencesKeys.PASSWORD] = password }
+        }
+        catch (e: Exception) {
+            Log.e(TAG, "password $password could not be stored in permanent storage due to ${e.toString()}")
+        }
+    }
+
+
     companion object {
         const val PASSWORD = "PASSWORD"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        runBlocking(Dispatchers.IO) {
+            Common.password = fetchPassword()
+        }
+
         enableEdgeToEdge()
         setContent {
             NumbasAppTheme {
@@ -97,7 +134,6 @@ class MainActivity : ComponentActivity() {
                 // State variables
                 var showPasswordPage by remember { mutableStateOf(false)}
                 var currentPasswordBad by remember { mutableStateOf(false)}
-                //var password by remember {mutableStateOf("")}
                 var launchData by remember { mutableStateOf(LaunchData("",""))}
 
                 // Handle custom URL intent
@@ -127,7 +163,7 @@ class MainActivity : ComponentActivity() {
                                     currentPasswordBad = false
                                     showPasswordPage = false
                                 } catch (e: IncorrectPasswordException) {
-                                    currentPasswordBad = true //this is not currently cascaded down....
+                                    currentPasswordBad = true
                                 }
                             }, currentPasswordBad
                             )
@@ -146,6 +182,7 @@ class MainActivity : ComponentActivity() {
         outState.run {
             putString(PASSWORD, Common.password)
         }
+        runBlocking(Dispatchers.IO) {storePassword(Common.password) }
         super.onSaveInstanceState(outState)
     }
 
