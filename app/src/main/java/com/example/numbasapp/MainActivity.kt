@@ -1,5 +1,6 @@
 package com.example.numbasapp
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -59,7 +60,11 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 
+val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "storage")
 private const val TAG = "NumbasMainActivity"
 
 class Common{
@@ -167,8 +172,8 @@ fun PasswordPage(savedPassword: String, sendPassword: (String) -> Unit, password
             Image(
             painter = painterResource(R.drawable.numbas_logo),
             contentDescription = "",
-                modifier = Modifier.fillMaxWidth(),
-            contentScale = ContentScale.Fit)
+                    modifier = Modifier.fillMaxWidth(0.33F),
+                contentScale = ContentScale.FillWidth)
             Text(
                 text = stringResource(R.string.opening_a_numbas_link),
                 style = MaterialTheme.typography.headlineLarge,
