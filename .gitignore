@@ -26,3 +26,4 @@ gen/
 out/
 # Log Files
 *.log
+keystore.properties

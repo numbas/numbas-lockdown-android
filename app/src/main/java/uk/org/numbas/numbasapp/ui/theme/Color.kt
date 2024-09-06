@@ -1,4 +1,4 @@
-package com.example.numbasapp.ui.theme
+package uk.org.numbas.numbasapp.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

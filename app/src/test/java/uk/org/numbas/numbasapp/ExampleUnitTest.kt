@@ -1,4 +1,4 @@
-package com.example.numbasapp
+package uk.org.numbas.numbasapp
 
 import org.junit.Test
 
