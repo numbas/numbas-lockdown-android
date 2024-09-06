@@ -8,7 +8,7 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.numbasapp"
+        applicationId = "uk.org.numbas.numbasapp"
         minSdk = 26
         targetSdk = 34
         versionCode = 1
