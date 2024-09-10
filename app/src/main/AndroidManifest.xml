@@ -14,7 +14,7 @@
         android:theme="@style/Theme.NumbasApp"
         tools:targetApi="31">
         <activity
-            android:name="uk.org.numbas.numbasapp.MainActivity"
+            android:name="uk.ac.ncl.mas.elearning.nclnumbas.MainActivity"
             android:exported="true"
             android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
             android:label="@string/app_name"

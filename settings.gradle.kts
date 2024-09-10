@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Numbas App"
+rootProject.name = "Numbas"
 include(":app")
  

@@ -1,11 +1,10 @@
 <resources>
-    <string name="app_name">Numbas App</string>
+    <string name="app_name">Numbas</string>
     <string name="opening_a_numbas_link">Opening a Numbas Link</string>
-    <string name="enter_password_instruction">Enter the password to open this Numbas link.\n Your instructor should have given you the password.</string>
+    <string name="enter_password_instruction">Enter the password to open this Numbas link.\nYour instructor should have given you the password.</string>
     <string name="enter_password">Enter Password</string>
-    <string name="password_failed_text">The current password could not be used to open this link. Either the password is incorrect, or the link is invalid.</string>
+    <string name="password_failed_text">That password could not be used to open this link. Either the password is incorrect, or the link is invalid.</string>
     <string name="open_link">Open</string>
     <string name="lockdown_app_declaration">This is the Numbas lockdown app</string>
-    <string name="use_a_link">You don\'t normally need to open this app directly.\n Click on a Numbas link in a browser to use this app</string>
-    <string name="open_test_page">Open the test page</string>
+    <string name="use_a_link">You don\'t normally need to open this app directly.\nClick on a Numbas link in a browser to use this app</string>
 </resources>
