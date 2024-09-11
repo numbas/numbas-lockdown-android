@@ -139,8 +139,8 @@ class MainActivity : ComponentActivity() {
                             launchData = decryptSettings(Common.password, salt, uri = data)
                             showPasswordPage = false
                         } catch (e: IncorrectPasswordException) {
-                            currentPasswordBad = true
                             showPasswordPage = true
+                            Common.password = ""
                         }
                     } else {
                         showPasswordPage = true
@@ -158,6 +158,7 @@ class MainActivity : ComponentActivity() {
                                     launchData = decryptSettings(Common.password, salt, uri = data)
                                     currentPasswordBad = false
                                     showPasswordPage = false
+                                    runBlocking(Dispatchers.IO) {storePassword(Common.password) }
                                 } catch (e: IncorrectPasswordException) {
                                     currentPasswordBad = true
                                 }
@@ -178,7 +179,6 @@ class MainActivity : ComponentActivity() {
         outState.run {
             putString(PASSWORD, Common.password)
         }
-        runBlocking(Dispatchers.IO) {storePassword(Common.password) }
         super.onSaveInstanceState(outState)
     }
 
