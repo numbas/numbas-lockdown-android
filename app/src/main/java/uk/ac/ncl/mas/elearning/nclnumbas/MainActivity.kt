@@ -58,6 +58,8 @@ import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -150,6 +152,7 @@ class MainActivity : ComponentActivity() {
                 // Main UI
                 Surface(color = MaterialTheme.colorScheme.background) {
                     if (showPasswordPage) {
+                        WindowCompat.setDecorFitsSystemWindows(window, false)
                         PasswordPage(
                             Common.password,
                             sendPassword = { enteredPassword ->
@@ -166,8 +169,10 @@ class MainActivity : ComponentActivity() {
                             )
                     }
                      else if (launchData.url.isNotEmpty() && launchData.token.isNotEmpty()) {
-                        LoadWebPage(launchData.url, mapOf("Authorization" to "Basic " + launchData.token))
+                         WindowCompat.setDecorFitsSystemWindows(window, true)
+                         LoadWebPage(launchData.url, mapOf("Authorization" to "Basic " + launchData.token))
                     } else {
+                        WindowCompat.setDecorFitsSystemWindows(window, false)
                         InfoPage()
                     }
                 }
