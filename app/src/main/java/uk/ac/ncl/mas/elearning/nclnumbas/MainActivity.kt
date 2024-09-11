@@ -210,7 +210,7 @@ fun PasswordPage(savedPassword: String, sendPassword: (String) -> Unit, password
             Image(
             painter = painterResource(R.drawable.numbas_logo),
             contentDescription = "",
-                    modifier = Modifier.fillMaxWidth(0.33F),
+                    modifier = Modifier.size(width=800.dp,height=148.dp).fillMaxWidth(),
                 contentScale = ContentScale.FillWidth)
             Text(
                 text = stringResource(R.string.opening_a_numbas_link),
