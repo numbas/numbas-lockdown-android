@@ -297,7 +297,7 @@ fun LoadWebPage(url: String, extraHeaders: Map<String,String>) {
                 webViewClient = NumbasWebViewClient(extraHeaders)
                 settings.javaScriptEnabled = true
                 settings.domStorageEnabled = true
-                settings.userAgentString = "Numbas lockdown (Version ${BuildConfig.VERSION_NAME}) (Platform: android) "
+                settings.userAgentString = "Numbas lockdown (Version: ${BuildConfig.VERSION_NAME}) (Platform: android)"
                 loadUrl(url, extraHeaders)
             }
         }
