@@ -4,20 +4,21 @@ plugins {
 }
 
 android {
-    namespace = "com.example.numbasapp"
+    namespace = "uk.ac.ncl.mas.elearning.nclnumbas"
     compileSdk = 34
 
     defaultConfig {
         applicationId = "uk.ac.ncl.mas.elearning.nclnumbas"
         minSdk = 26
         targetSdk = 34
-        versionCode = 5
-        versionName = "2.01"
+        versionCode = 6
+        versionName = "2.02"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
+        buildConfigField("String", "VERSION_NAME", "\"${versionName}\"")
     }
 
     buildTypes {

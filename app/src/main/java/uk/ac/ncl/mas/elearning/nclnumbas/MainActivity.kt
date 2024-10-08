@@ -44,6 +44,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import uk.ac.ncl.mas.elearning.nclnumbas.ui.theme.NumbasAppTheme
+import uk.ac.ncl.mas.elearning.nclnumbas.BuildConfig
+import uk.ac.ncl.mas.elearning.nclnumbas.R
 import org.bouncycastle.crypto.generators.SCrypt
 import org.json.JSONObject
 import javax.crypto.BadPaddingException
@@ -65,7 +67,6 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.example.numbasapp.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -296,6 +297,7 @@ fun LoadWebPage(url: String, extraHeaders: Map<String,String>) {
                 webViewClient = NumbasWebViewClient(extraHeaders)
                 settings.javaScriptEnabled = true
                 settings.domStorageEnabled = true
+                settings.userAgentString = "Numbas lockdown (Version ${BuildConfig.VERSION_NAME}) (Platform: android) "
                 loadUrl(url, extraHeaders)
             }
         }
