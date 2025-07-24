@@ -13,14 +13,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
@@ -290,18 +283,25 @@ class NumbasWebViewClient(private val headers: Map<String, String>) : WebViewCli
 
 @Composable
 fun LoadWebPage(url: String, extraHeaders: Map<String,String>) {
-    AndroidView(
-        modifier = Modifier.fillMaxSize(),
-        factory = { context ->
-            WebView(context).apply {
-                webViewClient = NumbasWebViewClient(extraHeaders)
-                settings.javaScriptEnabled = true
-                settings.domStorageEnabled = true
-                settings.userAgentString = "Numbas lockdown (Version: ${BuildConfig.VERSION_NAME}) (Platform: android)"
-                loadUrl(url, extraHeaders)
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(WindowInsets.systemBars.asPaddingValues()) // Handles top & bottom insets
+    ) {
+        AndroidView(
+            modifier = Modifier.fillMaxSize(),
+            factory = { context ->
+                WebView(context).apply {
+                    webViewClient = NumbasWebViewClient(extraHeaders)
+                    settings.javaScriptEnabled = true
+                    settings.domStorageEnabled = true
+                    settings.userAgentString =
+                        "Numbas lockdown (Version: ${BuildConfig.VERSION_NAME}) (Platform: android)"
+                    loadUrl(url, extraHeaders)
+                }
             }
-        }
-    )
+        )
+    }
 }
 
 @Preview

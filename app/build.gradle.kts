@@ -5,14 +5,14 @@ plugins {
 
 android {
     namespace = "uk.ac.ncl.mas.elearning.nclnumbas"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "uk.ac.ncl.mas.elearning.nclnumbas"
         minSdk = 26
-        targetSdk = 34
-        versionCode = 6
-        versionName = "2.02"
+        targetSdk = 36
+        versionCode = 7
+        versionName = "2.03"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
